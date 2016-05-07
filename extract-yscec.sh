@@ -14,25 +14,51 @@ else
     fi
 fi
 
-zipfile_count=0
 # Extract
-for file in $1*
+for file in $1/*
 do
     # Check if the file is tar-compatible file. If compatible, it returns 0. Else, it returns non-zero value.
-    tar -tf $file
+    tar -tf $file > /dev/null 2>&1
     if [ $? -eq 0 ]; then
-        tar -xf $file -C $destination
-        echo $structure
+        
+        ##  Tar compatible files.
+        declare structure=($(tar -tf $file))
+        num_tree=0
+        for((i=0; i<${#structure[@]}; i++ )); do
+            if [[ ${structure[$i]} =~ ^[^\/]*\/$ ]]; then
+                num_tree=$(($num_tree+1))
+            fi
+        done
+        
+        #echo "File: $file, N(tree)=$num_tree"
+        if [ $num_tree -ne 1 ]; then
+            # Remove prefix from YSCEC (..assignsubmission_file_) and file extension (all string at the right side of '.' character)
+            newfilename=$(echo $file | sed 's/^.*assignsubmission_file_\([^.]*\).*/\1/')
+            bad_tarfile+=($newfilename)
+
+            mkdir -p "$destination/$newfilename"
+            tar -xf $file -C "$destination/$newfilename"
+        else
+            tar -xf $file -C $destination
+        fi
     else
         # Check if the file is zip-compatible file. If compatiable, it returns 0. Else, it returns non-zero value.
-        unzip -t $file > /dev/null 2>&1
+        unzip -t $file >/dev/null 2>&1
         if [ $? -eq 0 ]; then
-            mkdir -p "$destination/ZIP$zipfile_count"
-            unzip $file -d "$destination/ZIP$zipfile_count"
-            zipfile_count=$(($zipfile_count+1))
+            # Remove prefix from YSCEC (..assignsubmission_file_) and file extension (all string at the right side of '.' character)
+            newfilename=$(echo $file | sed 's/^.*assignsubmission_file_\([^.]*\).*/\1/')
+            bad_zipfile+=($newfilename)
+
+            mkdir -p "$destination/$newfilename"
+            unzip $file -d "$destination/$newfilename"
         fi
     fi
 done
 
+# Debug Zone
+
 # Notice user that this program exit.
+echo "$0: ------Result------"
+echo "$0: Bad tar files: Total ${#bad_tarfile[@]}, ${bad_tarfile[@]}"
+echo "$0: Bad zip files: Total ${#bad_zipfile[@]}, ${bad_zipfile[@]}"
 echo "$0: Exit Program"
