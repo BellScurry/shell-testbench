@@ -1,5 +1,8 @@
 #
-# Usage: program <directory which contains .tar files> [destination (default: submission/)]
+#   Usage: program <$1> [$2]
+#
+#   $1 := directory which contains .tar files
+#   $2 := destination (default: submission/)
 #
 
 # Determine destination
