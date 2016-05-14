@@ -77,6 +77,14 @@ rm -rf $tmpdir
 
 # Notice user that this program exit.
 echo "$0: ------Result------"
-echo "$0: Bad tar files: Total ${#bad_tarfile[@]}, ${bad_tarfile[@]}"
+echo "$0: Bad tar files: Total ${#bad_tarfile[@]}"
+for (( i=0; i < ${#bad_tarfile[@]}; i++ )) do
+    echo -e "\t${bad_tarfile[$i]}"
+done
+
 echo "$0: Bad zip files: Total ${#bad_zipfile[@]}, ${bad_zipfile[@]}"
+for (( i=0; i < ${#bad_zipfile[@]}; i++ )) do
+    echo -e "\t${bad_zipfile[$i]}"
+done
+
 echo "$0: Exit Program"
