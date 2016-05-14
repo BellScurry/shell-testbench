@@ -1,9 +1,21 @@
 #
 #   Usage: program <$1> [$2]
 #
-#   $1 := directory which contains .tar files
+#   $1 := zip file from YSCEC
 #   $2 := destination (default: submission/)
 #
+
+# YSCEC always gives us .zip file.
+tmpdir="tmp_yscec_submission"
+unzip $1 -d $tmpdir
+
+# Trim all white space
+for file in $tmpdir/*
+do
+    renamed_file="$(echo -e "${file}" | tr -d '[[:space:]]')"
+    command="mv '$file' $renamed_file"
+    eval $command
+done
 
 # Determine destination
 if [ $# -gt 1 ]; then
@@ -18,7 +30,7 @@ else
 fi
 
 # Extract
-for file in $1/*
+for file in $tmpdir/*
 do
     # Check if the file is tar-compatible file. If compatible, it returns 0. Else, it returns non-zero value.
     tar -tf $file > /dev/null 2>&1
@@ -57,6 +69,9 @@ do
         fi
     fi
 done
+
+# Remove temporary directory
+rm -rf $tmpdir
 
 # Debug Zone
 
