@@ -30,14 +30,17 @@ yscec_remove_prefix_in () {
     ###   Renaming files.
     for file in $1/*
     do
+        ###   Extract filename from path.
+        filename=$(echo ${file} | sed -e 's/^.*\/\(.*\)/\1/')
+
         ###   Remove Non-ascii Characters in Filenames.
-        ascii_filename=$(echo ${file} | perl -pe 's/[^[:ascii:]]//g')
+        ascii_filename=$(echo ${filename} | perl -pe 's/[^[:ascii:]]//g')
     
         ###   Trim Prefix Attatched by YSCEC in Filenames.
         real_filename=$(echo ${ascii_filename} | sed -e 's/^.*assignsubmission_file_\(.*\)$/\1/') 
     
         ###   Modify Filename.
-        mv $file $1/${real_filename}
+        mv $1/$filename $1/$real_filename
     done
 }
 
