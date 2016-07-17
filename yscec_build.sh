@@ -2,7 +2,7 @@ echo "Usage: $0 <submission file directory> <executable directory>"
 
 mkdir $2
 
-for file in $2/*
+for file in $1/*
 do
     ###   Remove path info and extension.
     submission_name=$(echo $file | sed -e 's/\(.*\/\)*\(.*\)\..*/\2/')
